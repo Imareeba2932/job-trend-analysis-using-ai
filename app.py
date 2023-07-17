@@ -271,6 +271,97 @@ def analysis1():
 def co_relation():
     df = load_dataset()
     print(df.columns)
+    # split method to split payrate min to max
+
+    pay_split = df['payrate'].str[0:-1].str.split('-', expand=True)
+
+    #remove space in left and right
+    pay_split[0] =  pay_split[0].str.strip()
+
+    #remove comma 
+    pay_split[0] = pay_split[0].str.replace(',', '')
+
+    #remove all character in two condition
+    # 1 remove if only character
+    # 2 if start in number remove after all character
+    pay_split[0] = pay_split[0].str.replace(r'\D.*', '')
+
+    #remove space in left and right 
+    pay_split[1] =  pay_split[1].str.strip()
+
+    #remove comma 
+    pay_split[1] = pay_split[1].str.replace(',', '')
+
+    #remove all character in two condition
+    # 1 remove if only character
+    # 2 if start in number remove after all character
+    pay_split[1] = pay_split[1].str.replace(r'\D.*','')
+
+    pay_split[0] = pd.to_numeric(pay_split[0], errors='coerce')
+    pay_split[1] = pd.to_numeric(pay_split[1], errors='coerce')
+
+    pay=pd.concat([pay_split[0], pay_split[1]], axis=1, sort=False)
+
+    # rename the columns into min payrate and max payrate.
+    pay.rename(columns={0:'min_pay', 1:'max_pay'}, inplace=True )
+
+    # min and max payarte store the value in the dataframe.
+
+    df=pd.concat([df, pay], axis=1, sort=False)
+
+    df['avg_payrate']=(df['min_pay'].values + df['max_pay'].values)/2
+
+    # spliting the experience into min experience to max experience.
+
+    experience_split = df['experience'].str[0:-1].str.split('-', expand=True)
+
+    #remove space in left and right 
+    experience_split[0] =  experience_split[0].str.strip()
+
+    #remove comma 
+    experience_split[0] = experience_split[0].str.replace('yr', '')
+
+    #remove all character in two condition
+    # 1 remove if only character
+    # 2 if start in number remove after all character
+    experience_split[0] = experience_split[0].str.replace(r'yr', '')
+
+    #remove space in left and right 
+    experience_split[1] =  experience_split[1].str.strip()
+
+    #remove comma 
+    experience_split[1] = experience_split[1].str.replace('yr', '')
+
+    #remove all character in two condition
+    # 1 remove if only character
+    # 2 if start in number remove after all character
+    experience_split[1] = experience_split[1].str.replace(r'yr', '')
+
+    experience_split[0] = pd.to_numeric(experience_split[0], errors='coerce')
+    experience_split[1] = pd.to_numeric(experience_split[1], errors='coerce')
+
+    experience=pd.concat([experience_split[0], experience_split[1]], axis=1, sort=False)
+
+    # rename the cloumns to min and max experience
+
+    experience.rename(columns={0:'min_experience', 1:'max_experience'}, inplace=True)
+    
+    # store the min and max experience in the dataframe.
+
+    df=pd.concat([df, experience], axis=1, sort=False)
+
+    # Display average payrate and average experience.
+    # min experience and max experience define the average experience.
+    # min payrate and max payrate define the average payrate.
+
+    df['avg_payrate']=(df['min_pay'].values + df['max_pay'].values)/2
+    df['avg_experience']=(df['min_experience'].values + df['max_experience'].values)/2
+
+    df['postdate'].dtypes
+    df['postdate'] = pd.to_datetime(df['postdate'])
+    df['Year'] = df['postdate'].dt.year
+
+    df['avg_experience']=(df['min_experience'].values + df['max_experience'].values)/2
     fig1 = px.scatter_3d(df, x='avg_payrate', y='avg_experience', z='Year', color='avg_payrate', hover_data=['jobtitle'], title='3D Scatter Plot', width=800, height=600)
 
     fig2 =px.histogram(df, x='min_experience', y='min_pay', title='Relation between min_exp and min_pay', color_discrete_sequence=px.colors.sequential.RdBu, width=800, height=500, opacity=0.8, color='min_pay', hover_data=['min_experience', 'min_pay'], labels={'min_exp':'min_exp', 'min_pay':'min_pay'}, template='plotly_dark')
@@ -292,6 +383,46 @@ def co_relation():
 @app.route('/comparison')
 def co_mparison():
     df = load_dataset()
+    # split method to split payrate min to max
+
+    pay_split = df['payrate'].str[0:-1].str.split('-', expand=True)
+
+    #remove space in left and right
+    pay_split[0] =  pay_split[0].str.strip()
+
+    #remove comma 
+    pay_split[0] = pay_split[0].str.replace(',', '')
+
+    #remove all character in two condition
+    # 1 remove if only character
+    # 2 if start in number remove after all character
+    pay_split[0] = pay_split[0].str.replace(r'\D.*', '')
+
+    #remove space in left and right 
+    pay_split[1] =  pay_split[1].str.strip()
+
+    #remove comma 
+    pay_split[1] = pay_split[1].str.replace(',', '')
+
+    #remove all character in two condition
+    # 1 remove if only character
+    # 2 if start in number remove after all character
+    pay_split[1] = pay_split[1].str.replace(r'\D.*','')
+
+    pay_split[0] = pd.to_numeric(pay_split[0], errors='coerce')
+    pay_split[1] = pd.to_numeric(pay_split[1], errors='coerce')
+
+    pay=pd.concat([pay_split[0], pay_split[1]], axis=1, sort=False)
+
+    # rename the columns into min payrate and max payrate.
+    pay.rename(columns={0:'min_pay', 1:'max_pay'}, inplace=True )
+
+    # min and max payarte store the value in the dataframe.
+
+    df=pd.concat([df, pay], axis=1, sort=False)
+
+    df['avg_payrate']=(df['min_pay'].values + df['max_pay'].values)/2
+
     fig7 = px.scatter(df, x='industry', y='max_pay', color='industry', title='Relation between max_pay and industry', color_continuous_scale=px.colors.sequential.RdBu, width=800, height=800, opacity=0.8, hover_data=['max_pay', 'industry'], labels={'max_pay':'max_pay', 'industry':'industry'}, template='plotly_dark')
 
     fig8 = df[['min_pay','industry']].groupby(["industry"]).median().sort_values(by='min_pay', ascending=False).head(10)
